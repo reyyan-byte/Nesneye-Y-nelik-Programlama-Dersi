@@ -1,93 +1,77 @@
-package calisma2;
+package quiz3;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Main {
-	static Scanner scanner = new Scanner(System.in);
-	static ArrayList<String> dersler = new ArrayList<>();
-	static ArrayList<Integer> notlar = new ArrayList<>();
-	
-	public static void main(String[] args) {
-		ListeleriOlustur(dersler, notlar);
-		OrtalamadanBuyukler(dersler, notlar);
-		EnYuksekNot(dersler, notlar);
-		EnDusukNot(dersler, notlar);
+
+	public static void main(String[] args) throws Exception{
+		File dosya = new File("src/urunler.txt");
+		ArrayList<Urun> liste = ListeOlustur(dosya);
+		Yazdir(liste);
+		System.out.println("\n Swap Sonrası: ");
+		Swap(liste);
 
 	}
 	
-	public static void ListeleriOlustur(ArrayList<String> dersler, ArrayList<Integer> notlar) {
-		for(int i=0; i<5; i++) {
-			String dersAdi;
-			boolean ayni;
-			
-			do {
-				ayni = false;
-				System.out.print("\n" + (i+1) + ". Ders adını giriniz: ");
-				dersAdi = scanner.nextLine();
-				if(i==0) break;
-				for(int j=0; j<dersler.size(); j++) {
-					if(dersler.get(j).equalsIgnoreCase(dersAdi)){
-						System.out.println("Farklı bir ders adı giriniz!");
-						ayni = true;
-						break;
-					}
-				}
-			}while(ayni);
-			
-			System.out.print("Ders notu giriniz: ");
-			int dersNotu = scanner.nextInt();
-			scanner.nextLine();
-			dersler.add(dersAdi);
-			notlar.add(dersNotu);
-		}
-	}
-	
-	public static double Ortalama(ArrayList<Integer> notlar) {
-		int toplam = 0;
-		int dersSayisi = 0;
-		double ortalama;
-		for (Integer not : notlar) {
-			toplam += not;
-			dersSayisi++;
-		}
-		ortalama = toplam / dersSayisi;
-		return ortalama;
-	}
-
-	public static void OrtalamadanBuyukler(ArrayList<String> dersler,ArrayList<Integer> notlar) {
-		double ortalama = Ortalama(notlar);
-		System.out.println("\nOrtalamadan Büyük Dersler:");
-		for (int i = 0; i < dersler.size(); i++) {
-			if(notlar.get(i) > ortalama) {
-				System.out.println(dersler.get(i).toUpperCase());
+	public static ArrayList<Urun> ListeOlustur(File dosya) throws Exception{
+		ArrayList<Urun> UrunlerListesi = new ArrayList<>();
+		FileReader dosyaOkuyucu = new FileReader(dosya);
+		BufferedReader buffered = new BufferedReader(dosyaOkuyucu);
+		
+		String line;
+		while((line = buffered.readLine()) != null) {
+			if(line.trim().isEmpty()) continue;
+			String[] veriler = line.split(" ");
+			if(veriler.length >=5) {
+				int no = Integer.valueOf(veriler[0]);
+				String urunAdi = veriler[1];
+				double fiyat = Double.valueOf(veriler[2]);
+				int stok = Integer.valueOf(veriler[3]);
+				String MenseiUlke = veriler[4];
+				double ToplamDeger = fiyat * stok;
+				
+				Urun yeniUrun = new Urun(no, urunAdi, fiyat, stok, MenseiUlke, ToplamDeger);
+				UrunlerListesi.add(yeniUrun);
 			}
 		}
+		buffered.close();
+		return UrunlerListesi;
 	}
 
-	public static void EnYuksekNot(ArrayList<String> dersler,ArrayList<Integer> notlar) {
-		int enYuksekNot = notlar.get(0);
-		int enYuksekNotIndex = 0;
-		for(int i=1; i<dersler.size(); i++) {
-			if(notlar.get(i) > enYuksekNot) {
-				enYuksekNot = notlar.get(i);
-				enYuksekNotIndex = i;
+	public static void Yazdir(ArrayList<Urun> liste) {
+		System.out.println("| No | AletAdi | Fiyat | Stok | MenseiUlke | ToplamDeger |");
+		for (Urun urun : liste) {
+			System.out.println("| " + urun.No + " | " + urun.AletAdi + " | " + urun.Fiyat + " | " + urun.Stok + " | " + urun.MenseiUlke + " | " + urun.ToplamDeger+ "|");
+		}
+	}
+	
+	public static ArrayList<Urun> Swap(ArrayList<Urun> liste) {
+		double enYuksek = liste.get(0).ToplamDeger;
+		int enYuksekIndex = 0;
+		
+		double enDusuk = liste.get(0).ToplamDeger;
+		int enDusukIndex = 0;
+		
+		for (int i = 1; i < liste.size(); i++) {
+			if(enDusuk < liste.get(i).ToplamDeger) {
+				enDusuk = liste.get(i).ToplamDeger;
+				enDusukIndex = i;
+			}
+			
+			if(enYuksek > liste.get(i).ToplamDeger) {
+				enYuksek = liste.get(i).ToplamDeger;
+				enYuksekIndex = i;
 			}
 		}
 		
-		System.out.println("\nEn yüksek not: " + enYuksekNot + " (" + dersler.get(enYuksekNotIndex) + ")");
-	}
-
-	public static void EnDusukNot(ArrayList<String> dersler,ArrayList<Integer> notlar) {
-		int enDusukNot = notlar.get(0);
-		int enDusukNotIndex = 0;
-		for(int i=1; i<dersler.size(); i++) {
-			if(notlar.get(i) < enDusukNot) {
-				enDusukNot = notlar.get(i);
-				enDusukNotIndex = i;
-			}
-		}
+		Urun yedek = liste.get(enDusukIndex);
+		liste.set(enDusukIndex, liste.get(enYuksekIndex));
+		liste.set(enYuksekIndex, yedek);
 		
-		System.out.println("En düşük not: " + enDusukNot + " (" + dersler.get(enDusukNotIndex) + ")");
+		Yazdir(liste);
+		return liste;
 	}
 }

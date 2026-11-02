@@ -1,0 +1,10 @@
+1 AkilliTelefon 27800 30 GuneyKore
+2 DizustuBilgisayar 42500 18 Cin
+3 KablosuzKulaklik 2950 90 Vietnam
+4 AkilliSaat 3800 55 Japonya
+5 OyunKonsolu 24600 20 Turkiye
+6 BluetoothHoparlor 1750 65 Cin
+7 Drone 9400 10 Almanya
+8 Tablet 10200 25 Hindistan
+9 AkilliEvAsistani 5300 40 ABD
+10 TasinabilirSarjCihazi 950 130 Turkiye
